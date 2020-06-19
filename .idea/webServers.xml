@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="14d201ba-da43-45dd-a2a0-6c951d559336" name="learning-com">
+        <fileTransfer rootFolder="/sharedFolder/Danbi/Pytorch-CycleGAN" accessType="SFTP" host="digger.works" port="4088" sshConfigId="080a788d-ce2b-418d-a43d-b677c65fac86" sshConfig="root@digger.works:4088 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

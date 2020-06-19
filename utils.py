@@ -5,8 +5,12 @@ import sys
 
 from torch.autograd import Variable
 import torch
-from visdom import Visdom
+# from visdom import Visdom
 import numpy as np
+import wandb
+import Digo
+from PIL import Image
+
 
 def tensor2image(tensor):
     image = 127.5*(tensor[0].cpu().float().numpy() + 1.0)
@@ -14,9 +18,10 @@ def tensor2image(tensor):
         image = np.tile(image, (3,1,1))
     return image.astype(np.uint8)
 
+
 class Logger():
     def __init__(self, n_epochs, batches_epoch):
-        self.viz = Visdom()
+        # self.viz = Visdom()
         self.n_epochs = n_epochs
         self.batches_epoch = batches_epoch
         self.epoch = 1
@@ -27,7 +32,6 @@ class Logger():
         self.loss_windows = {}
         self.image_windows = {}
 
-
     def log(self, losses=None, images=None):
         self.mean_period += (time.time() - self.prev_time)
         self.prev_time = time.time()
@@ -36,35 +40,50 @@ class Logger():
 
         for i, loss_name in enumerate(losses.keys()):
             if loss_name not in self.losses:
-                self.losses[loss_name] = losses[loss_name].data[0]
+                self.losses[loss_name] = losses[loss_name].item()
             else:
-                self.losses[loss_name] += losses[loss_name].data[0]
+                self.losses[loss_name] += losses[loss_name].item()
 
             if (i+1) == len(losses.keys()):
                 sys.stdout.write('%s: %.4f -- ' % (loss_name, self.losses[loss_name]/self.batch))
+                wandb.log({loss_name: self.losses[loss_name]/self.batch})
+                Digo.log({loss_name: self.losses[loss_name]/self.batch})
+
             else:
                 sys.stdout.write('%s: %.4f | ' % (loss_name, self.losses[loss_name]/self.batch))
+                wandb.log({loss_name: self.losses[loss_name]/self.batch})
+                Digo.log({loss_name: self.losses[loss_name]/self.batch})
 
         batches_done = self.batches_epoch*(self.epoch - 1) + self.batch
         batches_left = self.batches_epoch*(self.n_epochs - self.epoch) + self.batches_epoch - self.batch 
         sys.stdout.write('ETA: %s' % (datetime.timedelta(seconds=batches_left*self.mean_period/batches_done)))
 
-        # Draw images
-        for image_name, tensor in images.items():
-            if image_name not in self.image_windows:
-                self.image_windows[image_name] = self.viz.image(tensor2image(tensor.data), opts={'title':image_name})
-            else:
-                self.viz.image(tensor2image(tensor.data), win=self.image_windows[image_name], opts={'title':image_name})
+        # WandB. End of epoch
+        if (self.batch % self.batches_epoch) == 0:
+            for image_key in images.keys():
+                wandb.log(
+                    {image_key: [wandb.Image(images[image_key][0].cpu().transpose(0, 2).numpy())]})
+
+        # Digo. End of epoch
+        if (self.batch % self.batches_epoch) == 0:
+            Digo.imageLog(
+                {"real_A": Image.fromarray(images["real_A"][0].cpu().transpose(0, 2).numpy(), "RGB"),
+                 "fake_A": Image.fromarray(images["fake_A"][0].cpu().transpose(0, 2).numpy(), "RGB"),
+                 "fake_B": Image.fromarray(images["fake_B"][0].cpu().transpose(0, 2).numpy(), "RGB")})
+
+            # {'real_A': real_A, 'real_B': real_B, 'fake_A': fake_A, 'fake_B': fake_B}
 
         # End of epoch
         if (self.batch % self.batches_epoch) == 0:
             # Plot losses
             for loss_name, loss in self.losses.items():
                 if loss_name not in self.loss_windows:
-                    self.loss_windows[loss_name] = self.viz.line(X=np.array([self.epoch]), Y=np.array([loss/self.batch]), 
-                                                                    opts={'xlabel': 'epochs', 'ylabel': loss_name, 'title': loss_name})
+                    # self.loss_windows[loss_name] = self.viz.line(X=np.array([self.epoch]), Y=np.array([loss/self.batch]),
+                    #                                                 opts={'xlabel': 'epochs', 'ylabel': loss_name, 'title': loss_name})
+                    pass
                 else:
-                    self.viz.line(X=np.array([self.epoch]), Y=np.array([loss/self.batch]), win=self.loss_windows[loss_name], update='append')
+                    # self.viz.line(X=np.array([self.epoch]), Y=np.array([loss/self.batch]), win=self.loss_windows[loss_name], update='append')
+                    pass
                 # Reset losses for next epoch
                 self.losses[loss_name] = 0.0
 
@@ -74,7 +93,6 @@ class Logger():
         else:
             self.batch += 1
 
-        
 
 class ReplayBuffer():
     def __init__(self, max_size=50):
@@ -98,6 +116,7 @@ class ReplayBuffer():
                     to_return.append(element)
         return Variable(torch.cat(to_return))
 
+
 class LambdaLR():
     def __init__(self, n_epochs, offset, decay_start_epoch):
         assert ((n_epochs - decay_start_epoch) > 0), "Decay must start before the training session ends!"
@@ -107,6 +126,7 @@ class LambdaLR():
 
     def step(self, epoch):
         return 1.0 - max(0, epoch + self.offset - self.decay_start_epoch)/(self.n_epochs - self.decay_start_epoch)
+
 
 def weights_init_normal(m):
     classname = m.__class__.__name__

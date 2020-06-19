@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class ResidualBlock(nn.Module):
     def __init__(self, in_features):
         super(ResidualBlock, self).__init__()
@@ -17,6 +18,7 @@ class ResidualBlock(nn.Module):
 
     def forward(self, x):
         return x + self.conv_block(x)
+
 
 class Generator(nn.Module):
     def __init__(self, input_nc, output_nc, n_residual_blocks=9):
@@ -60,6 +62,7 @@ class Generator(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+
 
 class Discriminator(nn.Module):
     def __init__(self, input_nc):

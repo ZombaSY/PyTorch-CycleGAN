@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="digger.works" id="4e91af43-18a8-41cd-96cd-d9bfef2b785d" port="4022" nameFormat="DESCRIPTIVE" username="ryuck" />
+    </configs>
+  </component>
+</project>

@@ -71,8 +71,6 @@ class Logger():
                  "fake_A": Image.fromarray(images["fake_A"][0].cpu().transpose(0, 2).numpy(), "RGB"),
                  "fake_B": Image.fromarray(images["fake_B"][0].cpu().transpose(0, 2).numpy(), "RGB")})
 
-            # {'real_A': real_A, 'real_B': real_B, 'fake_A': fake_A, 'fake_B': fake_B}
-
         # End of epoch
         if (self.batch % self.batches_epoch) == 0:
             # Plot losses

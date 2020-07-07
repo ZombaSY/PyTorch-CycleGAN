@@ -20,7 +20,7 @@ from datasets import ImageDataset
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--batchSize', type=int, default=1, help='size of the batches')
-    parser.add_argument('--dataroot', type=str, default='datasets/image_calibration/', help='root directory of the dataset')
+    parser.add_argument('--dataroot', type=str, default='A:/Users/SSY/Desktop/dataset/image_calibration/0619 train set')
     parser.add_argument('--input_nc', type=int, default=3, help='number of channels of input data')
     parser.add_argument('--output_nc', type=int, default=3, help='number of channels of output data')
     parser.add_argument('--size', type=int, default=256, help='size of the data (squared assumed)')
@@ -29,7 +29,6 @@ def main():
     parser.add_argument('--generator_A2B', type=str, default='output/netG_A2B.pth', help='A2B generator checkpoint file')
     parser.add_argument('--generator_B2A', type=str, default='output/netG_B2A.pth', help='B2A generator checkpoint file')
     opt = parser.parse_args()
-    print(opt)
 
     if torch.cuda.is_available() and not opt.cuda:
         print("WARNING: You have a CUDA device, so you should probably run with --cuda")

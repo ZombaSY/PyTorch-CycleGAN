@@ -1,0 +1,24 @@
+diff --git a/train.py b/train.py
+index 4b3d2ff..aabdadb 100644
+--- a/train.py
++++ b/train.py
+@@ -53,10 +53,9 @@ def main():
+     wandb.watch(netD_A)
+     wandb.watch(netD_B)
+ 
+-    Digo.init(api_key="qpqD6cHYvGG2XNHeGlHog8360T8uWHya", workspace_name='SunyongGod', project_name='sunyong project')
++    Digo.init(api_key="POEfn4Vagd85PSmBqgO8ORCtdXfrAhCY", workspace_name='sunyong2', project_name='sunyong2 project1')
+     Digo.setParameter(parser)
+ 
+-
+     if opt.cuda:
+         netG_A2B.cuda()
+         netG_B2A.cuda()
+diff --git a/train.sh b/train.sh
+index a6937e7..cb67970 100644
+--- a/train.sh
++++ b/train.sh
+@@ -1,2 +1,2 @@
+ #
+-python train.py --n_epochs 10 --decay_epoch 5 --batchSize 2 --n_cpu 4 --cuda
++python train.py --n_epochs 2 --decay_epoch 1 --batchSize 2 --n_cpu 4 --cuda

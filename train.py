@@ -54,7 +54,7 @@ def main():
     wandb.watch(netD_A)
     wandb.watch(netD_B)
 
-    Digo.init(api_key="qpqD6cHYvGG2XNHeGlHog8360T8uWHya", workspace_name='Yunsang', project_name='sunyong pro')
+    Digo.init(api_key="qpqD6cHYvGG2XNHeGlHog8360T8uWHya", workspace_name='Yunsang', project_name='HumanSegmantation')
     Digo.setParameter(parser)
 
     if opt.cuda:
